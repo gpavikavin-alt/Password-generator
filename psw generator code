@@ -1,0 +1,49 @@
+import secrets
+import string
+
+length = int(input("Enter the length of the password: "))
+characters = ""
+
+upper = input("Do you want uppercase letters? (y/n): ")
+if upper == 'y':
+    characters += string.ascii_uppercase
+lower = input("Do you want lowercase letters? (y/n): ")
+if lower == 'y':
+    characters += string.ascii_lowercase
+digits = input("Do you want digits? (y/n): ")
+if digits == 'y':
+    characters += string.digits
+symbols = input("Do you want symbols? (y/n): ")
+if symbols == 'y':
+    characters += string.punctuation
+
+if characters == "":
+    print("Please select at least one character type.")
+else:
+    count = int(input("Enter how many passwords you want to generate: "))
+    with open("passwords.txt", "w") as f:
+        for i in range(count):
+            # Auto‑regenerate until strong
+            while True:
+                password = ''.join(secrets.choice(characters) for i in range(length))
+                
+                # Strength check
+                category_used = 0
+                if any(c.isupper() for c in password): category_used += 1
+                if any(c.islower() for c in password): category_used += 1
+                if any(c.isdigit() for c in password): category_used += 1
+                if any(c in string.punctuation for c in password): category_used += 1
+
+                # Strength levels
+                if category_used < 2 or len(password) < 6:
+                    print("Password is WEAK ❌ … regenerating...")
+                elif category_used == 2 and len(password) >= 8:
+                    print("Generated password:", password)
+                    print("Password is MEDIUM ⚠️")
+                    f.write(password + "\n")
+                    break
+                else:
+                    print("Generated password:", password)
+                    print("Password is STRONG ✅")
+                    f.write(password + "\n")
+                    break
